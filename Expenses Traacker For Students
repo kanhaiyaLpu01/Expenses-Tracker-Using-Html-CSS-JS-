@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Expense Tracker App</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+    body { background: #f9fafb; color: #333; padding: 20px; }
+    h1 { text-align: center; margin-bottom: 20px; color: #2563eb; }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      margin: 6px 0;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 15px;
+    }
+
+    button {
+      background: #2563eb;
+      color: white;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover { background: #1e40af; }
+
+    .expense {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .expense span { font-weight: 500; }
+    .delete-btn {
+      background: #ef4444;
+      border: none;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .delete-btn:hover { background: #dc2626; }
+
+    .total-box {
+      background: #2563eb;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>💰 Expense Tracker</h1>
+
+  <!-- Input Form -->
+  <div class="card">
+    <input type="number" id="amount" placeholder="Enter Amount (₹)">
+    <select id="category">
+      <option value="">Select Category</option>
+      <option>🍔 Food</option>
+      <option>🚖 Travel</option>
+      <option>📚 Study</option>
+      <option>🎉 Entertainment</option>
+      <option>Other</option>
+    </select>
+    <button onclick="addExpense()">➕ Add Expense</button>
+  </div>
+
+  <!-- Total Expense -->
+  <div class="total-box">
+    Total Expense: ₹<span id="total">0</span>
+  </div>
+
+  <!-- Expense List -->
+  <div class="card">
+    <h3 style="margin-bottom: 10px;">📜 Expense History</h3>
+    <div id="list"></div>
+  </div>
+
+  <script>
+    let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
+
+    function addExpense() {
+      let amount = document.getElementById("amount").value;
+      let category = document.getElementById("category").value;
+
+      if(amount === "" || category === "") return alert("Please enter all details!");
+
+      let expense = {
+        amount: parseInt(amount),
+        category: category,
+        date: new Date().toLocaleDateString()
+      };
+
+      expenses.push(expense);
+      localStorage.setItem("expenses", JSON.stringify(expenses));
+      document.getElementById("amount").value = "";
+      document.getElementById("category").value = "";
+      showExpenses();
+    }
+
+    function showExpenses() {
+      let list = document.getElementById("list");
+      let total = 0;
+      list.innerHTML = "";
+      expenses.forEach((e, i) => {
+        total += e.amount;
+        list.innerHTML += `
+          <div class="expense">
+            <span>${e.category} - ₹${e.amount} <br><small>${e.date}</small></span>
+            <button class="delete-btn" onclick="deleteExpense(${i})">Delete</button>
+          </div>`;
+      });
+      document.getElementById("total").innerText = total;
+    }
+
+    function deleteExpense(index) {
+      expenses.splice(index, 1);
+      localStorage.setItem("expenses", JSON.stringify(expenses));
+      showExpenses();
+    }
+
+    showExpenses();
+  </script>
+</body>
+</html>
